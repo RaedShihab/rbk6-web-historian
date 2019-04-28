@@ -26,15 +26,67 @@ exports.initialize = function(pathsObj) {
 // modularize your code. Keep it clean!
 
 exports.readListOfUrls = function(callback) {
+  fs.readFile(exports.paths.list, (err, data) => {
+    let urlData = data.toString();
+    let urlArray = urlData.split('\n');
+    // console.log(urlArray);
+    callback(urlArray);
+  });
+  
 };
 
 exports.isUrlInList = function(url, callback) {
+  exports.readListOfUrls((urlArray) => {
+    let flag = false;
+    urlArray.forEach(element => {
+      if (url === element) {
+        flag = !flag;
+      }
+
+    });
+    callback(flag);
+  });
+  // exports.readListOfUrls( function(urlArray) {
+  //   let flag = false;
+  //   urlArray.forEach(function(element) {
+  //     if (element === url ) {
+  //       flag = !flag;
+  //     }
+  //   });
+  //   callback(flag);
+  // });
 };
 
 exports.addUrlToList = function(url, callback) {
+  
+  fs.writeFile(exports.paths.list, url, (err) => {
+    if (err) { throw err; }
+  });
+  callback(url);
 };
 
 exports.isUrlArchived = function(url, callback) {
+  var sitePath = path.join(exports.paths.archivedSites, url);
+  //console.log(sitePath);
+
+  //about fs.access : https://nodejs.org/api/fs.html#fs_fs_access_path_mode_callback
+  fs.access(sitePath, function (err) {
+    callback(!err);
+  });
+
+  // fs.readdir(exports.paths.archivedSites, (err, files) => {
+  //   let exists = false;
+  //   if (err) { throw err; }
+  //   files.forEach((file) => {
+  //     console.log(file);
+  //     console.log(url);
+  //     if (url === file) {
+  //       exists = !exists;
+  //     }
+  //   });
+  // });
+  // console.log(exists);
+  // callback(exists);
 };
 
 exports.downloadUrls = function(urls) {
